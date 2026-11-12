@@ -1,0 +1,32 @@
+# Render blueprint. The UI and API are one service, so this is the only
+# deployable: no separate frontend, no CORS in production.
+services:
+  - type: web
+    name: rag-eval
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    # $PORT is injected by Render; binding anything else times out the deploy.
+    startCommand: uvicorn app.api:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      # Render's default Python tracks the newest release. Pinned here and in
+      # backend/.python-version because a version without prebuilt wheels
+      # falls back to compiling from source and fails on the read-only cache.
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: PYTHONIOENCODING
+        value: utf-8
+      # The free tier has 512MB. The curated ~93-module corpus indexes in
+      # about 4s and fits comfortably; the full 875-document stdlib does not.
+      - key: RAG_STDLIB_FULL
+        value: "0"
+      - key: RAG_CHUNK_SIZE
+        value: "1024"
+      # TF-IDF needs no model download and no network at boot.
+      - key: RAG_EMBEDDER
+        value: tfidf
+      # Optional: enables LLM answers instead of extractive ones.
+      - key: GROQ_API_KEY
+        sync: false

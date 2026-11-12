@@ -24,6 +24,22 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
+
+# Function words carry no retrieval signal but do carry term frequency.
+# On a large corpus IDF suppresses them automatically; on a small one -- an
+# uploaded handful of documents -- there is not enough signal, and a query
+# like "can I deploy on a friday" gets dominated by "on" matching "On-call".
+# Filtering them explicitly makes retrieval behave the same at both scales.
+STOPWORDS = frozenset("""
+a an the and or but if then else for of to in on at by with from into over
+under again further is are was were be been being am do does did doing have
+has had having i me my we our you your he him his she her it its they them
+their what which who whom this that these those as not no nor only own same
+so than too very can will just should now how when where why all any both
+each few more most other some such about against between during before after
+above below up down out off through
+""".split())
+
 _TOKEN = re.compile(r"[a-z0-9_]+")
 
 
@@ -38,9 +54,13 @@ def tokenize(text: str) -> list[str]:
     text = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", text)
     tokens: list[str] = []
     for raw in _TOKEN.findall(text.lower()):
+        if raw in STOPWORDS:
+            continue
         tokens.append(raw)
         if "_" in raw:
-            tokens.extend(part for part in raw.split("_") if part)
+            tokens.extend(
+                part for part in raw.split("_") if part and part not in STOPWORDS
+            )
     return tokens
 
 

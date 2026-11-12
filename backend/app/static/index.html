@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>RAG Evaluation Harness</title>
+<meta name="description" content="Measure whether the retrieval half of a RAG system actually works: compare chunking strategies, compare retrievers, and verify every answer against its sources.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231e40af' stroke-width='2.5' stroke-linecap='round'><circle cx='11' cy='11' r='7'/><path d='M20 20l-3.5-3.5'/></svg>">
+<link rel="stylesheet" href="./app.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <div class="wrap bar">
+    <div class="brand">
+      <span class="mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
+        </svg>
+      </span>
+      <span>RAG&nbsp;Eval</span>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button role="tab" aria-selected="true"  aria-controls="panel-search" id="tab-search">1 &middot; Search</button>
+      <button role="tab" aria-selected="false" aria-controls="panel-ask"    id="tab-ask">2 &middot; Ask</button>
+      <button role="tab" aria-selected="false" aria-controls="panel-exp"    id="tab-exp">3 &middot; Results</button>
+    </nav>
+    <div class="status" id="status" aria-live="polite">
+      <span class="dot dot-idle"></span><span>connecting&hellip;</span>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+
+  <!-- ─────────────────────── WHAT IS THIS ─────────────────────── -->
+  <aside class="intro" id="intro">
+    <div class="intro-body">
+      <h2>What this is</h2>
+      <p>
+        An AI document assistant does two things: it <strong>searches</strong> your
+        documents for relevant passages, then <strong>writes</strong> an answer from
+        them. When the answer is wrong, people blame the writing step &mdash; but
+        usually the search step never found the right passage, so the model had
+        nothing to work from.
+      </p>
+      <p>
+        This tool measures the search step. It is currently indexing
+        <strong id="intro-docs">the Python standard library</strong>, so ask it
+        anything Python can do.
+      </p>
+      <ol class="steps">
+        <li><strong>Search</strong> &mdash; see which passages three different search methods find.</li>
+        <li><strong>Ask</strong> &mdash; get an answer where every sentence is checked against its source.</li>
+        <li><strong>Results</strong> &mdash; the experiment that found which setup works best.</li>
+      </ol>
+    </div>
+    <button class="intro-close" id="intro-close" aria-label="Hide this introduction">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+        <path d="M18 6L6 18M6 6l12 12"/>
+      </svg>
+    </button>
+  </aside>
+
+  <!-- ─────────────────────────── SEARCH ─────────────────────────── -->
+  <section id="panel-search" role="tabpanel" aria-labelledby="tab-search">
+    <h1>Which passages does the search find?</h1>
+    <p class="lede">
+      Type a question. You get the passages a search would hand to the AI, and the
+      score each method gave them. Tick <em>Compare all three</em> to watch the
+      methods disagree.
+    </p>
+
+    <form class="query" id="search-form">
+      <label class="sr-only" for="q">Your question</label>
+      <input id="q" name="q" type="search" autocomplete="off"
+             placeholder="Ask something Python can do&hellip;" required>
+      <button type="submit" class="btn primary">Search</button>
+    </form>
+
+    <div class="examples">
+      <span class="examples-label">Try one:</span>
+      <button type="button" class="ex" data-target="q">how do I shuffle a list randomly</button>
+      <button type="button" class="ex" data-target="q">create a temporary directory</button>
+      <button type="button" class="ex" data-target="q">wrap text to a fixed width</button>
+      <button type="button" class="ex" data-target="q">encode binary data as ascii text</button>
+    </div>
+
+    <fieldset class="modes">
+      <legend class="sr-only">Search method</legend>
+      <label title="Combines both of the methods below">
+        <input type="radio" name="mode" value="hybrid" checked><span>Hybrid</span>
+      </label>
+      <label title="Matches by meaning, even when the words differ">
+        <input type="radio" name="mode" value="dense"><span>By meaning</span>
+      </label>
+      <label title="Matches the literal words you typed">
+        <input type="radio" name="mode" value="bm25"><span>By keyword</span>
+      </label>
+      <label class="compare">
+        <input type="checkbox" id="compare-all"><span>Compare all three</span>
+      </label>
+    </fieldset>
+
+    <details class="helper">
+      <summary>What do the coloured scores mean?</summary>
+      <ul class="helper-list">
+        <li>
+          <span class="chip dense">by meaning</span>
+          An embedding score. Understands that &ldquo;encode binary&rdquo; relates to
+          base64 even with no shared words. Weak on exact names.
+        </li>
+        <li>
+          <span class="chip bm25">by keyword</span>
+          A BM25 score. Nails exact identifiers like <code>get_user_session</code>.
+          Blind to wording it has not seen.
+        </li>
+        <li>
+          <span class="chip rrf">combined</span>
+          The fused rank that decided the final order.
+        </li>
+      </ul>
+      <p class="note">
+        The two scores sit on completely different scales &mdash; roughly 0.25 versus
+        12 &mdash; which is why they are combined by <em>rank position</em> rather
+        than by adding the numbers. Adding them would let whichever method happened
+        to produce a large number win every time.
+      </p>
+    </details>
+
+    <div id="search-out" class="out"></div>
+  </section>
+
+  <!-- ──────────────────────────── ASK ───────────────────────────── -->
+  <section id="panel-ask" role="tabpanel" aria-labelledby="tab-ask" hidden>
+    <h1>Is the answer actually supported?</h1>
+    <p class="lede">
+      Every sentence must cite a passage, and each citation is checked against the
+      text it points at. Unsupported sentences get flagged rather than shown as fact.
+    </p>
+
+    <form class="query" id="ask-form">
+      <label class="sr-only" for="aq">Your question</label>
+      <input id="aq" name="aq" type="search" autocomplete="off"
+             placeholder="Ask a question about Python&hellip;" required>
+      <button type="submit" class="btn primary">Ask</button>
+    </form>
+
+    <div class="examples">
+      <span class="examples-label">Try one:</span>
+      <button type="button" class="ex" data-target="aq">how are temporary files created safely</button>
+      <button type="button" class="ex" data-target="aq">what does a thread lock do</button>
+      <button type="button" class="ex" data-target="aq">how is a zip archive written</button>
+    </div>
+
+    <details class="helper">
+      <summary>How the checking works</summary>
+      <p class="note">
+        Each sentence is compared against the passage it cites. If too little of the
+        sentence appears in that passage, it is marked unsupported. The check is
+        blunt on purpose: the alternative is asking the model whether it told the
+        truth, and a model that invented a fact will happily confirm that it did not.
+      </p>
+      <p class="note" id="generator-note"></p>
+    </details>
+
+    <div id="ask-out" class="out"></div>
+  </section>
+
+  <!-- ──────────────────────── EXPERIMENTS ───────────────────────── -->
+  <section id="panel-exp" role="tabpanel" aria-labelledby="tab-exp" hidden>
+    <h1>Which setup actually works best?</h1>
+    <p class="lede">
+      Building a search system means choosing how to split documents, how big the
+      pieces should be, and which method to search with. Those are usually guesses
+      copied from a tutorial. Here they are measured &mdash; every combination,
+      scored against questions with known correct answers.
+    </p>
+
+    <details class="helper" open>
+      <summary>How to read this table</summary>
+      <ul class="helper-list plain">
+        <li><strong>split</strong> &mdash; how documents were cut up: <code>fixed</code> every N characters, <code>recursive</code> at paragraph breaks, <code>auto</code> at function and heading boundaries.</li>
+        <li><strong>top-1</strong> &mdash; how often the single best result was correct. <em>The column that matters most.</em></li>
+        <li><strong>top-5</strong> &mdash; how often the right document appeared anywhere in the top five. Near 1.0 everywhere, so it cannot separate setups.</li>
+        <li><strong>rank score</strong> &mdash; rewards putting the right answer higher rather than merely including it.</li>
+      </ul>
+      <p class="note">Click any heading to sort. Highlighted rows share the best top-1 score.</p>
+    </details>
+
+    <div id="exp-out" class="out"></div>
+  </section>
+
+</main>
+
+<footer class="wrap foot">
+  <p>
+    Retrieval measured, not assumed. A plain keyword baseline is included on purpose:
+    an accuracy figure means nothing without a control beside it.
+  </p>
+</footer>
+
+<script src="./app.js"></script>
+</body>
+</html>

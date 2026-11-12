@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: "Tests"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.12', '3.13']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: backend/requirements-dev.txt
+
+      - name: Install
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Tests
+        working-directory: backend
+        env:
+          PYTHONIOENCODING: utf-8
+        run: pytest tests/ -q
+
+      - name: App imports and indexes
+        working-directory: backend
+        env:
+          PYTHONIOENCODING: utf-8
+        run: |
+          python -c "
+          from app.api import app, build_index
+          build_index()
+          print(f'{len(app.routes)} routes registered')
+          "
+
+  smoke:
+    name: "End-to-end smoke"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: backend/requirements-dev.txt
+
+      - name: Install
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Serve and exercise every endpoint
+        working-directory: backend
+        env:
+          PYTHONIOENCODING: utf-8
+          RAG_EMBEDDER: tfidf
+        run: |
+          uvicorn app.api:app --host 127.0.0.1 --port 8020 &
+          for i in $(seq 1 60); do
+            curl -sf http://127.0.0.1:8020/health > /dev/null && break
+            sleep 2
+          done
+
+          curl -sf http://127.0.0.1:8020/health > /dev/null
+          curl -sf http://127.0.0.1:8020/ > /dev/null
+          curl -sf http://127.0.0.1:8020/app.css > /dev/null
+          curl -sf http://127.0.0.1:8020/app.js > /dev/null
+          curl -sf "http://127.0.0.1:8020/questions?limit=5" > /dev/null
+
+          for mode in dense bm25 hybrid; do
+            curl -sf -X POST http://127.0.0.1:8020/search \
+              -H 'Content-Type: application/json' \
+              -d "{\"query\":\"how is a path normalised\",\"k\":3,\"mode\":\"$mode\"}" \
+              | python -c "import sys,json; assert json.load(sys.stdin)['hits'], 'no hits for $mode'"
+          done
+
+          # Extractive answers are built only from retrieved spans, so they
+          # must always pass the grounding check. If this fails, either the
+          # generator or the verifier has regressed.
+          curl -sf -X POST http://127.0.0.1:8020/ask \
+            -H 'Content-Type: application/json' \
+            -d '{"query":"how are temporary files created","k":4}' \
+            | python -c "
+          import sys, json
+          a = json.load(sys.stdin)
+          assert a['claims'], 'no claims produced'
+          assert a['fully_grounded'], f'extractive answer was not grounded: {a}'
+          print('grounding check passed')
+          "

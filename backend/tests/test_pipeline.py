@@ -310,3 +310,41 @@ def test_evaluate_retrieval_reports_failures(retriever):
     assert result.questions == 2
     assert "bad" in result.failures
     assert "ok" not in result.failures
+
+
+# ------------------------------------------------------ stopword handling
+
+def test_stopwords_are_dropped_from_tokens():
+    assert tokenize("can I deploy on a friday") == ["deploy", "friday"]
+
+
+def test_identifier_parts_survive_stopword_filtering():
+    """Splitting an identifier must not be undone by the stopword list."""
+    tokens = tokenize("get_user_session")
+    assert "get_user_session" in tokens
+    assert {"user", "session"} <= set(tokens)
+
+
+def test_stopwords_do_not_dominate_a_small_corpus():
+    """
+    The bug this guards: on a handful of documents there is not enough IDF
+    signal to suppress function words, so "can I deploy on a friday" matched
+    the "On-call" section through the word "on" alone.
+    """
+    from app.chunking import chunk_markdown
+
+    handbook = (
+        "# Handbook\n\n"
+        "## On-call rotation\n"
+        "On-call runs Monday to Monday. The primary responder acknowledges a page "
+        "within five minutes, and on-call escalates on no acknowledgement.\n\n"
+        "## Deployment windows\n"
+        "Deploys are allowed Monday through Thursday. Friday deploys require "
+        "written approval from a staff engineer.\n"
+    )
+    chunks = chunk_markdown(handbook, "handbook.md", size=400)
+    retriever = Retriever(get_embedder("tfidf")).index(chunks)
+
+    for mode in ("dense", "bm25", "hybrid"):
+        top = retriever.search("can I deploy on a friday", k=1, mode=mode)[0]
+        assert "Deployment" in top.chunk.text, f"{mode} matched the wrong section"

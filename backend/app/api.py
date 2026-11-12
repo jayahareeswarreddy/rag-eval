@@ -10,10 +10,13 @@ from __future__ import annotations
 
 import os
 import time
+from pathlib import Path
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from .chunking import chunk_auto, describe
@@ -28,6 +31,7 @@ from .embedding import get_embedder
 from .evaluation import evaluate_retrieval, run_grid
 from .generation import answer_question, get_generator
 from .retrieval import Retriever
+from .sessions import MAX_FILES, UploadRejected, store
 
 STATE: dict = {
     "corpus": None,
@@ -107,6 +111,10 @@ class SearchRequest(BaseModel):
     query: str = Field(min_length=1, max_length=500)
     k: int = Field(default=5, ge=1, le=20)
     mode: str = Field(default="hybrid", pattern="^(dense|bm25|hybrid)$")
+    # When set, search the visitor's uploaded documents instead of the demo
+    # corpus. An unknown or expired id is an error rather than a silent
+    # fallback, so nobody is told their own files answered when they did not.
+    session_id: str | None = Field(default=None, max_length=64)
 
 
 class AskRequest(SearchRequest):
@@ -114,17 +122,48 @@ class AskRequest(SearchRequest):
     floor: float = Field(default=0.45, ge=0.0, le=1.0)
 
 
-def _retriever() -> Retriever:
+def _retriever(session_id: str | None = None) -> Retriever:
+    if session_id:
+        session = store.get(session_id)
+        if session is None:
+            raise HTTPException(
+                status_code=404,
+                detail="That upload session has expired. Upload the files again.",
+            )
+        if session.retriever is None:
+            raise HTTPException(status_code=400, detail="no documents in that session")
+        return session.retriever
+
     retriever = STATE.get("retriever")
     if retriever is None:
         raise HTTPException(status_code=503, detail="index is still building")
     return retriever
 
 
+STATIC_DIR = Path(__file__).resolve().parent / "static"
+app.mount("/assets", StaticFiles(directory=STATIC_DIR), name="assets")
+
+
 @app.get("/", include_in_schema=False)
+async def index():
+    """The UI and the API are one service: one deploy, no CORS in production."""
+    return FileResponse(STATIC_DIR / "index.html")
+
+
 @app.head("/", include_in_schema=False)
-async def root():
-    return {"service": "rag-eval", "docs": "/docs", "status": "running"}
+async def index_head():
+    # Platform probes and uptime monitors default to HEAD.
+    return FileResponse(STATIC_DIR / "index.html")
+
+
+@app.get("/app.css", include_in_schema=False)
+async def app_css():
+    return FileResponse(STATIC_DIR / "app.css", media_type="text/css")
+
+
+@app.get("/app.js", include_in_schema=False)
+async def app_js():
+    return FileResponse(STATIC_DIR / "app.js", media_type="text/javascript")
 
 
 @app.get("/health")
@@ -151,9 +190,12 @@ async def health():
 @app.post("/search")
 async def search(request: SearchRequest):
     """Retrieve chunks. Returns per-retriever scores for explainability."""
-    hits = _retriever().search(request.query, k=request.k, mode=request.mode)
+    hits = _retriever(request.session_id).search(
+        request.query, k=request.k, mode=request.mode
+    )
     return {
         "query": request.query,
+        "scope": "uploaded" if request.session_id else "corpus",
         "mode": request.mode,
         "hits": [
             {
@@ -173,7 +215,9 @@ async def search(request: SearchRequest):
 @app.post("/ask")
 async def ask(request: AskRequest):
     """Retrieve, generate, and verify every claim against its cited source."""
-    hits = _retriever().search(request.query, k=request.k, mode=request.mode)
+    hits = _retriever(request.session_id).search(
+        request.query, k=request.k, mode=request.mode
+    )
     answer = answer_question(request.query, hits, floor=request.floor)
     return answer.as_dict()
 
@@ -230,3 +274,62 @@ async def experiments():
             detail="no stored results; run scripts/run_experiments.py first",
         )
     return {"results": json.loads(path.read_text(encoding="utf-8"))}
+
+
+@app.post("/upload")
+async def upload(
+    files: list[UploadFile] = File(...),
+    session_id: str | None = None,
+):
+    """
+    Index a visitor's own documents into a temporary session.
+
+    Text and source files only. Everything is held in memory, capped, and
+    expires; nothing is written to disk. The response reports which files were
+    skipped and why, so a partial upload is visible rather than silent.
+    """
+    if not files:
+        raise HTTPException(status_code=422, detail="no files were sent")
+    if len(files) > MAX_FILES:
+        raise HTTPException(
+            status_code=422, detail=f"at most {MAX_FILES} files per upload"
+        )
+
+    payload: list[tuple[str, bytes]] = []
+    for item in files:
+        payload.append((item.filename or "untitled", await item.read()))
+
+    try:
+        session, skipped = store.add(payload, session_id=session_id)
+    except UploadRejected as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    if not session.documents:
+        raise HTTPException(
+            status_code=422,
+            detail={"message": "nothing could be indexed", "skipped": skipped},
+        )
+
+    return {**session.summary(), "skipped": skipped}
+
+
+@app.get("/sessions/{session_id}")
+async def session_info(session_id: str):
+    session = store.get(session_id)
+    if session is None:
+        raise HTTPException(status_code=404, detail="session not found or expired")
+    return session.summary()
+
+
+@app.delete("/sessions/{session_id}")
+async def session_delete(session_id: str):
+    """Let a visitor remove their documents before the TTL does."""
+    if not store.drop(session_id):
+        raise HTTPException(status_code=404, detail="session not found or expired")
+    return {"deleted": session_id}
+
+
+@app.get("/upload-limits")
+async def upload_limits():
+    """The caps, so the UI can state them instead of discovering them."""
+    return store.stats()

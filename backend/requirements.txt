@@ -5,3 +5,4 @@ numpy==2.1.3
 python-dotenv==1.0.1
 # Answer generation. Works against Groq or OpenAI; both optional.
 openai==1.57.0
+python-multipart==0.0.20

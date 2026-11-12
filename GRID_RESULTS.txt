@@ -1,0 +1,32 @@
+corpus: {'name': 'python-stdlib-full', 'documents': 875, 'total_chars': 14056748, 'mean_doc_chars': 16065}
+dev questions: 300 | holdout: 279 | grid time: 86885s
+
+chunking    size retrieval embed      chunks    R@1    R@5    MRR  nDCG@5      ms
+---------------------------------------------------------------------------------
+recursive    512 bm25      tfidf       36605  0.947  1.000  0.971   0.978  214.56
+fixed        512 bm25      tfidf       31692  0.937  1.000  0.965   0.974   93.23
+fixed        512 hybrid    tfidf       31692  0.890  1.000  0.939   0.955  153.10
+recursive    512 hybrid    tfidf       36605  0.893  0.997  0.939   0.954  184.19
+auto        2000 bm25      tfidf       26384  0.950  0.990  0.969   0.974   42.37
+recursive   1024 bm25      tfidf       17537  0.913  0.990  0.950   0.960   51.10
+fixed       1024 bm25      tfidf       15974  0.907  0.990  0.944   0.956   38.22
+auto         512 bm25      tfidf       54459  0.960  0.987  0.973   0.976  181.01
+auto        1024 bm25      tfidf       34478  0.957  0.987  0.972   0.976   71.60
+auto         512 hybrid    tfidf       54459  0.950  0.987  0.968   0.973  604.96
+auto        1024 hybrid    tfidf       34478  0.950  0.987  0.968   0.973  146.42
+auto         512 dense     tfidf       54459  0.930  0.987  0.954   0.963  135.00
+auto        2000 hybrid    tfidf       26384  0.920  0.987  0.948   0.958  105.59
+auto        1024 dense     tfidf       34478  0.893  0.987  0.933   0.947  235.73
+fixed        512 dense     tfidf       31692  0.870  0.987  0.921   0.938   70.49
+recursive   1024 hybrid    tfidf       17537  0.847  0.987  0.909   0.929  423.49
+fixed       1024 hybrid    tfidf       15974  0.850  0.983  0.911   0.929   72.01
+recursive   2000 bm25      tfidf        8635  0.887  0.980  0.930   0.943 89910.70
+fixed       2000 bm25      tfidf        8333  0.877  0.980  0.927   0.940   21.94
+fixed       2000 hybrid    tfidf        8333  0.800  0.977  0.882   0.906   41.00
+recursive    512 dense     tfidf       36605  0.840  0.973  0.896   0.914  132.73
+fixed       1024 dense     tfidf       15974  0.823  0.973  0.889   0.910   38.17
+recursive   2000 hybrid    tfidf        8635  0.810  0.973  0.887   0.909  105.57
+fixed       2000 dense     tfidf        8333  0.757  0.973  0.848   0.879   19.17
+auto        2000 dense     tfidf       26384  0.850  0.970  0.904   0.920   70.75
+recursive   1024 dense     tfidf       17537  0.763  0.963  0.852   0.879   43.89
+recursive   2000 dense     tfidf        8635  0.700  0.963  0.810   0.849   33.12
