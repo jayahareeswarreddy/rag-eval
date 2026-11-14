@@ -50,21 +50,29 @@ class BM25:
     def __init__(self, k1: float = 1.5, b: float = 0.75) -> None:
         self.k1 = k1
         self.b = b
-        self.doc_tokens: list[list[str]] = []
         self.doc_freqs: list[Counter] = []
+        self.doc_lengths: list[int] = []
         self.idf: dict[str, float] = {}
         self.avg_len: float = 0.0
 
     def fit(self, texts: list[str]) -> "BM25":
-        self.doc_tokens = [tokenize(t) for t in texts]
-        self.doc_freqs = [Counter(tokens) for tokens in self.doc_tokens]
-        lengths = [len(t) for t in self.doc_tokens]
-        self.avg_len = (sum(lengths) / len(lengths)) if lengths else 0.0
+        # Only the per-document length is needed later, not the token list.
+        # Keeping the lists alive costs tens of megabytes on a large corpus
+        # and buys nothing.
+        self.doc_freqs = []
+        self.doc_lengths = []
+        for text in texts:
+            tokens = tokenize(text)
+            self.doc_freqs.append(Counter(tokens))
+            self.doc_lengths.append(len(tokens))
+        self.avg_len = (
+            sum(self.doc_lengths) / len(self.doc_lengths) if self.doc_lengths else 0.0
+        )
 
         n = len(texts)
         document_frequency: Counter = Counter()
-        for tokens in self.doc_tokens:
-            document_frequency.update(set(tokens))
+        for freqs in self.doc_freqs:
+            document_frequency.update(freqs.keys())
 
         self.idf = {
             term: math.log(1 + (n - df + 0.5) / (df + 0.5))
@@ -76,7 +84,7 @@ class BM25:
         query_tokens = tokenize(query)
         out = np.zeros(len(self.doc_freqs), dtype=np.float32)
         for i, freqs in enumerate(self.doc_freqs):
-            length = len(self.doc_tokens[i])
+            length = self.doc_lengths[i]
             total = 0.0
             for term in query_tokens:
                 tf = freqs.get(term)
@@ -129,6 +137,7 @@ class Retriever:
         self.embedder = embedder
         self.chunks: list[Chunk] = []
         self.matrix: np.ndarray = np.zeros((0, 0), dtype=np.float32)
+        self.sparse = False
         self.bm25 = BM25()
 
     def index(self, chunks: list[Chunk]) -> "Retriever":
@@ -137,14 +146,26 @@ class Retriever:
         if not texts:
             self.matrix = np.zeros((0, max(self.embedder.dim, 1)), dtype=np.float32)
             return self
+
         self.embedder.fit(texts)
-        self.matrix = self.embedder.encode(texts)
+        # A sparse embedder scores through an inverted index. Materialising
+        # its matrix instead would be chunks x vocabulary of mostly zeros --
+        # 595MB for this corpus, which does not fit in a small container.
+        self.sparse = hasattr(self.embedder, "score_all")
+        if self.sparse:
+            self.embedder.build_sparse(texts)
+            self.matrix = np.zeros((0, 0), dtype=np.float32)
+        else:
+            self.matrix = self.embedder.encode(texts)
+
         self.bm25.fit(texts)
         return self
 
     def _dense_scores(self, query: str) -> np.ndarray:
         if not len(self.chunks):
             return np.zeros(0, dtype=np.float32)
+        if self.sparse:
+            return self.embedder.score_all(query)
         # Both sides are unit vectors, so the dot product is cosine.
         return self.matrix @ self.embedder.encode_one(query)
 

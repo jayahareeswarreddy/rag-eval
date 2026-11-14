@@ -104,6 +104,8 @@ class TfidfEmbedder(Embedder):
         self.vocabulary: dict[str, int] = {}
         self.idf: np.ndarray = np.zeros(0, dtype=np.float32)
         self.dim = 0
+        self._postings: dict[int, list[tuple[int, float]]] = {}
+        self._rows = 0
 
     def fit(self, corpus: list[str]) -> "TfidfEmbedder":
         document_frequency: dict[str, int] = {}
@@ -139,6 +141,61 @@ class TfidfEmbedder(Embedder):
                 # says much less than the second.
                 matrix[row, index] = (1.0 + math.log(count)) * self.idf[index]
         return _normalise(matrix)
+
+
+    # ---------------------------------------------------------------- sparse
+
+    def build_sparse(self, texts: list[str]) -> None:
+        """
+        Build an inverted index: term -> [(row, weight), ...].
+
+        The dense alternative is a chunks x vocabulary matrix, which for 7,437
+        chunks over a 20,000-term vocabulary is 595MB of mostly zeros and will
+        not fit in a small container. Each chunk actually carries on the order
+        of eighty distinct terms, so the same information as postings is a few
+        megabytes. Scoring is exact cosine either way, because both sides stay
+        L2-normalised; only the storage changes.
+        """
+        self._postings = {}
+        self._rows = len(texts)
+        for row, text in enumerate(texts):
+            weights = self._weights(text)
+            if not weights:
+                continue
+            for index, weight in weights.items():
+                self._postings.setdefault(index, []).append((row, weight))
+
+    def _weights(self, text: str) -> dict:
+        """Normalised TF-IDF weights for one document, as {term_index: w}."""
+        counts = {}
+        for token in tokenize(text):
+            index = self.vocabulary.get(token)
+            if index is not None:
+                counts[index] = counts.get(index, 0) + 1
+        if not counts:
+            return {}
+        weights = {
+            index: (1.0 + math.log(count)) * self.idf[index]
+            for index, count in counts.items()
+        }
+        norm = math.sqrt(sum(w * w for w in weights.values()))
+        if norm == 0:
+            return {}
+        return {index: w / norm for index, w in weights.items()}
+
+    def score_all(self, query: str) -> np.ndarray:
+        """
+        Cosine of the query against every indexed document.
+
+        Only documents sharing a term with the query are touched, so cost is
+        proportional to the postings for the query's terms rather than to the
+        size of the corpus.
+        """
+        scores = np.zeros(self._rows, dtype=np.float32)
+        for index, weight in self._weights(query).items():
+            for row, doc_weight in self._postings.get(index, ()):
+                scores[row] += weight * doc_weight
+        return scores
 
 
 class FastEmbedEmbedder(Embedder):
