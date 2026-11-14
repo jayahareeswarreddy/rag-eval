@@ -112,7 +112,12 @@ class RetrievalResult:
     ndcg_at_5: float
     chunk_stats: dict
     index_seconds: float
-    query_ms_mean: float
+    # Median and p95, never the mean. A laptop that suspends mid-run records
+    # the suspend inside perf_counter, and one such sample moved a reported
+    # mean from 15ms to 89,910ms. Percentiles absorb that; a mean cannot.
+    query_ms_median: float
+    query_ms_p95: float
+    query_ms_max: float
     # Questions where nothing relevant was retrieved at all, by id. These are
     # the only rows worth reading by hand.
     failures: list[str] = field(default_factory=list)
@@ -162,6 +167,13 @@ def evaluate_retrieval(
     def mean(values: list[float]) -> float:
         return round(sum(values) / len(values), 4) if values else 0.0
 
+    def pct(values: list[float], q: float) -> float:
+        if not values:
+            return 0.0
+        ordered = sorted(values)
+        index = min(int(q * len(ordered)), len(ordered) - 1)
+        return round(ordered[index], 2)
+
     return RetrievalResult(
         config=config,
         questions=len(questions),
@@ -174,7 +186,9 @@ def evaluate_retrieval(
         ndcg_at_5=mean(ndcgs),
         chunk_stats=chunk_stats,
         index_seconds=round(index_seconds, 3),
-        query_ms_mean=round(mean(latencies), 2),
+        query_ms_median=pct(latencies, 0.5),
+        query_ms_p95=pct(latencies, 0.95),
+        query_ms_max=pct(latencies, 1.0),
         failures=failures,
     )
 
@@ -261,7 +275,7 @@ def format_table(results: list[RetrievalResult], limit: int = 20) -> str:
     """Render results as a fixed-width table for the terminal and the README."""
     header = (
         f"{'chunking':<10} {'size':>5} {'retrieval':<9} {'embed':<9} "
-        f"{'chunks':>7} {'R@1':>6} {'R@5':>6} {'MRR':>6} {'nDCG@5':>7} {'ms':>7}"
+        f"{'chunks':>7} {'R@1':>6} {'R@5':>6} {'MRR':>6} {'nDCG@5':>7} {'ms p50':>7}"
     )
     lines = [header, "-" * len(header)]
     for r in results[:limit]:
@@ -270,6 +284,6 @@ def format_table(results: list[RetrievalResult], limit: int = 20) -> str:
             f"{c['chunking']:<10} {c['chunk_size']:>5} {c['retrieval']:<9} "
             f"{c['embedder']:<9} {r.chunk_stats['count']:>7} "
             f"{r.recall_at_1:>6.3f} {r.recall_at_5:>6.3f} {r.mrr:>6.3f} "
-            f"{r.ndcg_at_5:>7.3f} {r.query_ms_mean:>7.2f}"
+            f"{r.ndcg_at_5:>7.3f} {r.query_ms_median:>7.2f}"
         )
     return "\n".join(lines)

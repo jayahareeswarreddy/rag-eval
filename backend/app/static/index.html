@@ -72,6 +72,36 @@
       methods disagree.
     </p>
 
+
+    <!-- ─────────────────── YOUR OWN DOCUMENTS ─────────────────── -->
+    <section class="scope" aria-labelledby="scope-heading">
+      <h2 id="scope-heading" class="scope-title">Search your own documents</h2>
+
+      <div class="dropzone" id="dropzone">
+        <input type="file" id="file-input" multiple
+               accept=".txt,.md,.markdown,.rst,.log,.py,.js,.ts,.tsx,.jsx,.java,.go,.rb,.rs,.c,.h,.cpp,.cs,.sh,.sql,.json,.yaml,.yml,.toml,.ini,.cfg,.csv,.tsv"
+               class="sr-only">
+        <svg class="dz-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+          <path d="M7 10l5-5 5 5"/><path d="M12 5v12"/>
+        </svg>
+        <p class="dz-main">
+          <button type="button" class="linklike" id="browse">Choose files</button>
+          or drag them here
+        </p>
+        <p class="dz-sub" id="dz-limits">Text and source files</p>
+      </div>
+
+      <div id="scope-state" class="scope-state" hidden>
+        <div class="scope-row">
+          <span class="scope-badge" id="scope-badge">Searching your files</span>
+          <span class="scope-files" id="scope-files"></span>
+          <button type="button" class="btn small" id="clear-docs">Clear</button>
+        </div>
+        <p class="note" id="scope-skipped"></p>
+      </div>
+    </section>
+
     <form class="query" id="search-form">
       <label class="sr-only" for="q">Your question</label>
       <input id="q" name="q" type="search" autocomplete="off"
@@ -202,5 +232,6 @@
 </footer>
 
 <script src="./app.js"></script>
+<script src="./upload.js"></script>
 </body>
 </html>

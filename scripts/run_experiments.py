@@ -12,7 +12,9 @@ import sys
 import time
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+# app/ and data/ live under backend/, not at the repository root.
+BACKEND = Path(__file__).resolve().parents[1] / "backend"
+sys.path.insert(0, str(BACKEND))
 
 from app.corpus import (  # noqa: E402
     build_questions_from_docstrings,
@@ -58,7 +60,7 @@ def main() -> int:
     print(f"\n{len(results)} configurations in {time.perf_counter() - started:.0f}s\n")
     print(format_table(results, limit=40))
 
-    out = Path(args.out) if args.out else Path(__file__).resolve().parents[1] / "data" / "grid_results.json"
+    out = Path(args.out) if args.out else BACKEND / "data" / "grid_results.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps([r.as_dict() for r in results], indent=1), encoding="utf-8")
     print(f"\nwrote {out}")

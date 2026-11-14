@@ -1,191 +1,59 @@
 [
  {
   "config": {
-   "chunking": "recursive",
-   "chunk_size": 512,
-   "retrieval": "bm25",
-   "embedder": "tfidf"
-  },
-  "questions": 300,
-  "recall_at_1": 0.9467,
-  "recall_at_3": 0.9967,
-  "recall_at_5": 1.0,
-  "recall_at_10": 1.0,
-  "precision_at_5": 0.2317,
-  "mrr": 0.9708,
-  "ndcg_at_5": 0.9783,
-  "chunk_stats": {
-   "count": 36605,
-   "mean_chars": 382.4,
-   "min_chars": 3,
-   "max_chars": 512
-  },
-  "index_seconds": 40.897,
-  "query_ms_mean": 214.56,
-  "failures": []
- },
- {
-  "config": {
-   "chunking": "fixed",
-   "chunk_size": 512,
-   "retrieval": "bm25",
-   "embedder": "tfidf"
-  },
-  "questions": 300,
-  "recall_at_1": 0.9367,
-  "recall_at_3": 0.9933,
-  "recall_at_5": 1.0,
-  "recall_at_10": 1.0,
-  "precision_at_5": 0.2394,
-  "mrr": 0.9648,
-  "ndcg_at_5": 0.9738,
-  "chunk_stats": {
-   "count": 31692,
-   "mean_chars": 505.8,
-   "min_chars": 65,
-   "max_chars": 512
-  },
-  "index_seconds": 27.413,
-  "query_ms_mean": 93.23,
-  "failures": []
- },
- {
-  "config": {
-   "chunking": "fixed",
-   "chunk_size": 512,
-   "retrieval": "hybrid",
-   "embedder": "tfidf"
-  },
-  "questions": 300,
-  "recall_at_1": 0.89,
-  "recall_at_3": 0.98,
-  "recall_at_5": 1.0,
-  "recall_at_10": 1.0,
-  "precision_at_5": 0.2369,
-  "mrr": 0.9389,
-  "ndcg_at_5": 0.9545,
-  "chunk_stats": {
-   "count": 31692,
-   "mean_chars": 505.8,
-   "min_chars": 65,
-   "max_chars": 512
-  },
-  "index_seconds": 27.413,
-  "query_ms_mean": 153.1,
-  "failures": []
- },
- {
-  "config": {
-   "chunking": "recursive",
-   "chunk_size": 512,
-   "retrieval": "hybrid",
-   "embedder": "tfidf"
-  },
-  "questions": 300,
-  "recall_at_1": 0.8933,
-  "recall_at_3": 0.9867,
-  "recall_at_5": 0.9967,
-  "recall_at_10": 0.9967,
-  "precision_at_5": 0.2255,
-  "mrr": 0.9392,
-  "ndcg_at_5": 0.9539,
-  "chunk_stats": {
-   "count": 36605,
-   "mean_chars": 382.4,
-   "min_chars": 3,
-   "max_chars": 512
-  },
-  "index_seconds": 40.897,
-  "query_ms_mean": 184.19,
-  "failures": [
-   "zipimport.py::find_spec"
-  ]
- },
- {
-  "config": {
    "chunking": "auto",
    "chunk_size": 2000,
    "retrieval": "bm25",
    "embedder": "tfidf"
   },
-  "questions": 300,
-  "recall_at_1": 0.95,
-  "recall_at_3": 0.99,
-  "recall_at_5": 0.99,
-  "recall_at_10": 0.99,
-  "precision_at_5": 0.259,
-  "mrr": 0.9689,
-  "ndcg_at_5": 0.9744,
+  "questions": 150,
+  "recall_at_1": 0.9533,
+  "recall_at_3": 0.9933,
+  "recall_at_5": 0.9933,
+  "recall_at_10": 0.9933,
+  "precision_at_5": 0.2624,
+  "mrr": 0.97,
+  "ndcg_at_5": 0.976,
   "chunk_stats": {
    "count": 26384,
    "mean_chars": 754.9,
    "min_chars": 35,
    "max_chars": 2208
   },
-  "index_seconds": 13.603,
-  "query_ms_mean": 42.37,
+  "index_seconds": 16.676,
+  "query_ms_median": 25.84,
+  "query_ms_p95": 37.57,
+  "query_ms_max": 61.5,
   "failures": [
-   "multiprocessing/connection.py::wait",
-   "multiprocessing/managers.py::list_segments",
-   "site-packages/pip/_vendor/distlib/compat.py::configure_custom"
+   "multiprocessing/connection.py::wait"
   ]
  },
  {
   "config": {
    "chunking": "recursive",
-   "chunk_size": 1024,
+   "chunk_size": 512,
    "retrieval": "bm25",
    "embedder": "tfidf"
   },
-  "questions": 300,
-  "recall_at_1": 0.9133,
-  "recall_at_3": 0.99,
-  "recall_at_5": 0.99,
-  "recall_at_10": 0.9933,
-  "precision_at_5": 0.2188,
-  "mrr": 0.9499,
-  "ndcg_at_5": 0.96,
+  "questions": 150,
+  "recall_at_1": 0.8933,
+  "recall_at_3": 0.9733,
+  "recall_at_5": 0.9933,
+  "recall_at_10": 1.0,
+  "precision_at_5": 0.2258,
+  "mrr": 0.9353,
+  "ndcg_at_5": 0.9492,
   "chunk_stats": {
-   "count": 17537,
-   "mean_chars": 799.8,
-   "min_chars": 4,
-   "max_chars": 1024
+   "count": 36605,
+   "mean_chars": 382.4,
+   "min_chars": 3,
+   "max_chars": 512
   },
-  "index_seconds": 13.784,
-  "query_ms_mean": 51.1,
-  "failures": [
-   "site-packages/pip/_vendor/distlib/metadata.py::get_fullname",
-   "pkgutil.py::get_data"
-  ]
- },
- {
-  "config": {
-   "chunking": "fixed",
-   "chunk_size": 1024,
-   "retrieval": "bm25",
-   "embedder": "tfidf"
-  },
-  "questions": 300,
-  "recall_at_1": 0.9067,
-  "recall_at_3": 0.9867,
-  "recall_at_5": 0.99,
-  "recall_at_10": 0.99,
-  "precision_at_5": 0.2212,
-  "mrr": 0.9436,
-  "ndcg_at_5": 0.9555,
-  "chunk_stats": {
-   "count": 15974,
-   "mean_chars": 1001.0,
-   "min_chars": 129,
-   "max_chars": 1024
-  },
-  "index_seconds": 10.545,
-  "query_ms_mean": 38.22,
-  "failures": [
-   "site-packages/pip/_vendor/distlib/metadata.py::get_fullname",
-   "pydoc.py::filelink",
-   "email/headerregistry.py::BaseHeader"
-  ]
+  "index_seconds": 9.419,
+  "query_ms_median": 47.57,
+  "query_ms_p95": 82.64,
+  "query_ms_max": 96.3,
+  "failures": []
  },
  {
   "config": {
@@ -194,27 +62,27 @@
    "retrieval": "bm25",
    "embedder": "tfidf"
   },
-  "questions": 300,
+  "questions": 150,
   "recall_at_1": 0.96,
   "recall_at_3": 0.9867,
   "recall_at_5": 0.9867,
   "recall_at_10": 0.9867,
-  "precision_at_5": 0.3659,
-  "mrr": 0.9728,
-  "ndcg_at_5": 0.9764,
+  "precision_at_5": 0.3781,
+  "mrr": 0.9733,
+  "ndcg_at_5": 0.9768,
   "chunk_stats": {
    "count": 54459,
    "mean_chars": 399.6,
    "min_chars": 33,
    "max_chars": 730
   },
-  "index_seconds": 1060.566,
-  "query_ms_mean": 181.01,
+  "index_seconds": 17.474,
+  "query_ms_median": 37.53,
+  "query_ms_p95": 51.43,
+  "query_ms_max": 62.7,
   "failures": [
    "multiprocessing/reduction.py::send_handle",
-   "multiprocessing/connection.py::wait",
-   "multiprocessing/managers.py::list_segments",
-   "site-packages/pip/_vendor/distlib/compat.py::configure_custom"
+   "multiprocessing/connection.py::wait"
   ]
  },
  {
@@ -224,27 +92,27 @@
    "retrieval": "bm25",
    "embedder": "tfidf"
   },
-  "questions": 300,
-  "recall_at_1": 0.9567,
+  "questions": 150,
+  "recall_at_1": 0.96,
   "recall_at_3": 0.9867,
   "recall_at_5": 0.9867,
   "recall_at_10": 0.9867,
-  "precision_at_5": 0.2911,
-  "mrr": 0.9717,
-  "ndcg_at_5": 0.9756,
+  "precision_at_5": 0.3003,
+  "mrr": 0.9722,
+  "ndcg_at_5": 0.976,
   "chunk_stats": {
    "count": 34478,
    "mean_chars": 588.4,
    "min_chars": 35,
    "max_chars": 1241
   },
-  "index_seconds": 90.723,
-  "query_ms_mean": 71.6,
+  "index_seconds": 13.827,
+  "query_ms_median": 28.24,
+  "query_ms_p95": 37.07,
+  "query_ms_max": 43.25,
   "failures": [
    "multiprocessing/reduction.py::send_handle",
-   "multiprocessing/connection.py::wait",
-   "multiprocessing/managers.py::list_segments",
-   "site-packages/pip/_vendor/distlib/compat.py::configure_custom"
+   "multiprocessing/connection.py::wait"
   ]
  },
  {
@@ -254,27 +122,27 @@
    "retrieval": "hybrid",
    "embedder": "tfidf"
   },
-  "questions": 300,
-  "recall_at_1": 0.95,
+  "questions": 150,
+  "recall_at_1": 0.9467,
   "recall_at_3": 0.9867,
   "recall_at_5": 0.9867,
   "recall_at_10": 0.9867,
-  "precision_at_5": 0.3557,
-  "mrr": 0.9683,
-  "ndcg_at_5": 0.9731,
+  "precision_at_5": 0.3674,
+  "mrr": 0.9656,
+  "ndcg_at_5": 0.971,
   "chunk_stats": {
    "count": 54459,
    "mean_chars": 399.6,
    "min_chars": 33,
    "max_chars": 730
   },
-  "index_seconds": 1060.566,
-  "query_ms_mean": 604.96,
+  "index_seconds": 17.474,
+  "query_ms_median": 170.36,
+  "query_ms_p95": 199.48,
+  "query_ms_max": 224.53,
   "failures": [
    "multiprocessing/reduction.py::send_handle",
-   "multiprocessing/connection.py::wait",
-   "multiprocessing/managers.py::list_segments",
-   "site-packages/pip/_vendor/distlib/compat.py::configure_custom"
+   "multiprocessing/connection.py::wait"
   ]
  },
  {
@@ -284,27 +152,27 @@
    "retrieval": "hybrid",
    "embedder": "tfidf"
   },
-  "questions": 300,
-  "recall_at_1": 0.95,
-  "recall_at_3": 0.9867,
+  "questions": 150,
+  "recall_at_1": 0.9267,
+  "recall_at_3": 0.98,
   "recall_at_5": 0.9867,
   "recall_at_10": 0.9867,
-  "precision_at_5": 0.2823,
-  "mrr": 0.9678,
-  "ndcg_at_5": 0.9727,
+  "precision_at_5": 0.2867,
+  "mrr": 0.955,
+  "ndcg_at_5": 0.9632,
   "chunk_stats": {
    "count": 34478,
    "mean_chars": 588.4,
    "min_chars": 35,
    "max_chars": 1241
   },
-  "index_seconds": 90.723,
-  "query_ms_mean": 146.42,
+  "index_seconds": 13.827,
+  "query_ms_median": 111.68,
+  "query_ms_p95": 132.26,
+  "query_ms_max": 147.13,
   "failures": [
    "multiprocessing/reduction.py::send_handle",
-   "multiprocessing/connection.py::wait",
-   "multiprocessing/managers.py::list_segments",
-   "site-packages/pip/_vendor/distlib/compat.py::configure_custom"
+   "multiprocessing/connection.py::wait"
   ]
  },
  {
@@ -314,27 +182,27 @@
    "retrieval": "dense",
    "embedder": "tfidf"
   },
-  "questions": 300,
-  "recall_at_1": 0.93,
-  "recall_at_3": 0.9733,
-  "recall_at_5": 0.9867,
+  "questions": 150,
+  "recall_at_1": 0.9133,
+  "recall_at_3": 0.9667,
+  "recall_at_5": 0.98,
   "recall_at_10": 0.9867,
-  "precision_at_5": 0.3393,
-  "mrr": 0.9543,
-  "ndcg_at_5": 0.9625,
+  "precision_at_5": 0.3286,
+  "mrr": 0.9438,
+  "ndcg_at_5": 0.9521,
   "chunk_stats": {
    "count": 54459,
    "mean_chars": 399.6,
    "min_chars": 33,
    "max_chars": 730
   },
-  "index_seconds": 1060.566,
-  "query_ms_mean": 135.0,
+  "index_seconds": 17.474,
+  "query_ms_median": 120.65,
+  "query_ms_p95": 135.6,
+  "query_ms_max": 147.33,
   "failures": [
    "tkinter/simpledialog.py::askstring",
-   "multiprocessing/reduction.py::send_handle",
-   "multiprocessing/managers.py::list_segments",
-   "site-packages/pip/_vendor/distlib/compat.py::configure_custom"
+   "multiprocessing/reduction.py::send_handle"
   ]
  },
  {
@@ -344,301 +212,378 @@
    "retrieval": "hybrid",
    "embedder": "tfidf"
   },
-  "questions": 300,
-  "recall_at_1": 0.92,
-  "recall_at_3": 0.9733,
-  "recall_at_5": 0.9867,
-  "recall_at_10": 0.9867,
+  "questions": 150,
+  "recall_at_1": 0.88,
+  "recall_at_3": 0.9667,
+  "recall_at_5": 0.98,
+  "recall_at_10": 0.98,
   "precision_at_5": 0.2417,
-  "mrr": 0.9482,
-  "ndcg_at_5": 0.9579,
+  "mrr": 0.9249,
+  "ndcg_at_5": 0.939,
   "chunk_stats": {
    "count": 26384,
    "mean_chars": 754.9,
    "min_chars": 35,
    "max_chars": 2208
   },
-  "index_seconds": 13.603,
-  "query_ms_mean": 105.59,
+  "index_seconds": 16.676,
+  "query_ms_median": 88.99,
+  "query_ms_p95": 102.43,
+  "query_ms_max": 117.8,
   "failures": [
-   "multiprocessing/connection.py::wait",
-   "email/headerregistry.py::BaseHeader",
-   "multiprocessing/managers.py::list_segments",
-   "site-packages/pip/_vendor/distlib/compat.py::configure_custom"
-  ]
- },
- {
-  "config": {
-   "chunking": "auto",
-   "chunk_size": 1024,
-   "retrieval": "dense",
-   "embedder": "tfidf"
-  },
-  "questions": 300,
-  "recall_at_1": 0.8933,
-  "recall_at_3": 0.9767,
-  "recall_at_5": 0.9867,
-  "recall_at_10": 0.9867,
-  "precision_at_5": 0.2572,
-  "mrr": 0.9334,
-  "ndcg_at_5": 0.947,
-  "chunk_stats": {
-   "count": 34478,
-   "mean_chars": 588.4,
-   "min_chars": 35,
-   "max_chars": 1241
-  },
-  "index_seconds": 90.723,
-  "query_ms_mean": 235.73,
-  "failures": [
+   "pkgutil.py::get_data",
    "multiprocessing/reduction.py::send_handle",
-   "email/headerregistry.py::BaseHeader",
-   "multiprocessing/managers.py::list_segments",
-   "site-packages/pip/_vendor/distlib/compat.py::configure_custom"
+   "multiprocessing/connection.py::wait"
   ]
  },
  {
   "config": {
    "chunking": "fixed",
    "chunk_size": 512,
-   "retrieval": "dense",
+   "retrieval": "bm25",
    "embedder": "tfidf"
   },
-  "questions": 300,
-  "recall_at_1": 0.87,
-  "recall_at_3": 0.97,
-  "recall_at_5": 0.9867,
-  "recall_at_10": 0.99,
-  "precision_at_5": 0.2359,
-  "mrr": 0.9215,
-  "ndcg_at_5": 0.9378,
+  "questions": 150,
+  "recall_at_1": 0.86,
+  "recall_at_3": 0.98,
+  "recall_at_5": 0.98,
+  "recall_at_10": 0.98,
+  "precision_at_5": 0.2299,
+  "mrr": 0.9156,
+  "ndcg_at_5": 0.9322,
   "chunk_stats": {
    "count": 31692,
    "mean_chars": 505.8,
    "min_chars": 65,
    "max_chars": 512
   },
-  "index_seconds": 27.413,
-  "query_ms_mean": 70.49,
+  "index_seconds": 6.971,
+  "query_ms_median": 21.76,
+  "query_ms_p95": 32.95,
+  "query_ms_max": 54.98,
   "failures": [
-   "site-packages/pip/_vendor/rich/progress_bar.py::update",
-   "site-packages/pip/_internal/locations/__init__.py::get_platlib",
-   "email/headerregistry.py::BaseHeader"
+   "asyncio/exceptions.py::CancelledError",
+   "site-packages/pip/_vendor/distlib/metadata.py::get_fullname",
+   "pydoc.py::filelink"
   ]
  },
  {
   "config": {
    "chunking": "recursive",
    "chunk_size": 1024,
-   "retrieval": "hybrid",
+   "retrieval": "bm25",
    "embedder": "tfidf"
   },
-  "questions": 300,
-  "recall_at_1": 0.8467,
+  "questions": 150,
+  "recall_at_1": 0.86,
   "recall_at_3": 0.9733,
-  "recall_at_5": 0.9867,
-  "recall_at_10": 0.99,
-  "precision_at_5": 0.2204,
-  "mrr": 0.9094,
-  "ndcg_at_5": 0.9288,
+  "recall_at_5": 0.98,
+  "recall_at_10": 0.9867,
+  "precision_at_5": 0.216,
+  "mrr": 0.9136,
+  "ndcg_at_5": 0.93,
   "chunk_stats": {
    "count": 17537,
    "mean_chars": 799.8,
    "min_chars": 4,
    "max_chars": 1024
   },
-  "index_seconds": 13.784,
-  "query_ms_mean": 423.49,
+  "index_seconds": 5.546,
+  "query_ms_median": 22.07,
+  "query_ms_p95": 42.51,
+  "query_ms_max": 62.17,
   "failures": [
-   "site-packages/pip/_vendor/rich/progress_bar.py::update",
-   "site-packages/pip/_vendor/distlib/metadata.py::get_fullname",
-   "email/headerregistry.py::BaseHeader"
-  ]
- },
- {
-  "config": {
-   "chunking": "fixed",
-   "chunk_size": 1024,
-   "retrieval": "hybrid",
-   "embedder": "tfidf"
-  },
-  "questions": 300,
-  "recall_at_1": 0.85,
-  "recall_at_3": 0.9733,
-  "recall_at_5": 0.9833,
-  "recall_at_10": 0.9867,
-  "precision_at_5": 0.2182,
-  "mrr": 0.9107,
-  "ndcg_at_5": 0.9289,
-  "chunk_stats": {
-   "count": 15974,
-   "mean_chars": 1001.0,
-   "min_chars": 129,
-   "max_chars": 1024
-  },
-  "index_seconds": 10.545,
-  "query_ms_mean": 72.01,
-  "failures": [
-   "site-packages/pip/_vendor/rich/progress_bar.py::update",
-   "site-packages/pip/_vendor/distlib/metadata.py::get_fullname",
-   "pydoc.py::filelink",
-   "email/headerregistry.py::BaseHeader"
-  ]
- },
- {
-  "config": {
-   "chunking": "recursive",
-   "chunk_size": 2000,
-   "retrieval": "bm25",
-   "embedder": "tfidf"
-  },
-  "questions": 300,
-  "recall_at_1": 0.8867,
-  "recall_at_3": 0.9767,
-  "recall_at_5": 0.98,
-  "recall_at_10": 0.9833,
-  "precision_at_5": 0.2093,
-  "mrr": 0.9301,
-  "ndcg_at_5": 0.9427,
-  "chunk_stats": {
-   "count": 8635,
-   "mean_chars": 1626.2,
-   "min_chars": 4,
-   "max_chars": 2000
-  },
-  "index_seconds": 57623.893,
-  "query_ms_mean": 89910.7,
-  "failures": [
-   "site-packages/pip/_vendor/rich/progress_bar.py::update",
    "asyncio/exceptions.py::CancelledError",
-   "site-packages/pip/_vendor/distlib/metadata.py::get_fullname",
-   "email/headerregistry.py::BaseHeader",
-   "zipimport.py::find_spec"
-  ]
- },
- {
-  "config": {
-   "chunking": "fixed",
-   "chunk_size": 2000,
-   "retrieval": "bm25",
-   "embedder": "tfidf"
-  },
-  "questions": 300,
-  "recall_at_1": 0.8767,
-  "recall_at_3": 0.98,
-  "recall_at_5": 0.98,
-  "recall_at_10": 0.9833,
-  "precision_at_5": 0.2128,
-  "mrr": 0.9267,
-  "ndcg_at_5": 0.9401,
-  "chunk_stats": {
-   "count": 8333,
-   "mean_chars": 1910.6,
-   "min_chars": 251,
-   "max_chars": 2000
-  },
-  "index_seconds": 6.263,
-  "query_ms_mean": 21.94,
-  "failures": [
-   "site-packages/pip/_vendor/rich/progress_bar.py::update",
-   "asyncio/exceptions.py::CancelledError",
-   "site-packages/pip/_vendor/distlib/metadata.py::get_fullname",
-   "pydoc.py::filelink",
-   "email/headerregistry.py::BaseHeader"
-  ]
- },
- {
-  "config": {
-   "chunking": "fixed",
-   "chunk_size": 2000,
-   "retrieval": "hybrid",
-   "embedder": "tfidf"
-  },
-  "questions": 300,
-  "recall_at_1": 0.8,
-  "recall_at_3": 0.9767,
-  "recall_at_5": 0.9767,
-  "recall_at_10": 0.98,
-  "precision_at_5": 0.2146,
-  "mrr": 0.8816,
-  "ndcg_at_5": 0.9058,
-  "chunk_stats": {
-   "count": 8333,
-   "mean_chars": 1910.6,
-   "min_chars": 251,
-   "max_chars": 2000
-  },
-  "index_seconds": 6.263,
-  "query_ms_mean": 41.0,
-  "failures": [
-   "site-packages/pip/_vendor/rich/progress_bar.py::update",
-   "asyncio/exceptions.py::CancelledError",
-   "site-packages/pip/_vendor/distlib/metadata.py::get_fullname",
-   "pydoc.py::filelink",
-   "email/headerregistry.py::BaseHeader",
-   "site-packages/pip/_vendor/urllib3/util/ssl_match_hostname.py::match_hostname"
+   "site-packages/pip/_vendor/distlib/metadata.py::get_fullname"
   ]
  },
  {
   "config": {
    "chunking": "recursive",
    "chunk_size": 512,
-   "retrieval": "dense",
+   "retrieval": "hybrid",
    "embedder": "tfidf"
   },
-  "questions": 300,
-  "recall_at_1": 0.84,
+  "questions": 150,
+  "recall_at_1": 0.82,
   "recall_at_3": 0.94,
-  "recall_at_5": 0.9733,
-  "recall_at_10": 0.9833,
-  "precision_at_5": 0.2141,
-  "mrr": 0.8961,
-  "ndcg_at_5": 0.9144,
+  "recall_at_5": 0.98,
+  "recall_at_10": 0.98,
+  "precision_at_5": 0.2194,
+  "mrr": 0.8849,
+  "ndcg_at_5": 0.9089,
   "chunk_stats": {
    "count": 36605,
    "mean_chars": 382.4,
    "min_chars": 3,
    "max_chars": 512
   },
-  "index_seconds": 40.897,
-  "query_ms_mean": 132.73,
+  "index_seconds": 9.419,
+  "query_ms_median": 108.47,
+  "query_ms_p95": 135.8,
+  "query_ms_max": 162.1,
   "failures": [
-   "site-packages/pip/_vendor/distlib/metadata.py::get_fullname",
-   "site-packages/pip/_internal/locations/__init__.py::get_platlib",
-   "email/headerregistry.py::BaseHeader",
-   "secrets.py::randbelow",
-   "zipimport.py::find_spec"
+   "asyncio/exceptions.py::CancelledError",
+   "tkinter/simpledialog.py::askstring",
+   "site-packages/pip/_vendor/distlib/metadata.py::get_fullname"
+  ]
+ },
+ {
+  "config": {
+   "chunking": "auto",
+   "chunk_size": 1024,
+   "retrieval": "dense",
+   "embedder": "tfidf"
+  },
+  "questions": 150,
+  "recall_at_1": 0.88,
+  "recall_at_3": 0.9533,
+  "recall_at_5": 0.9733,
+  "recall_at_10": 0.98,
+  "precision_at_5": 0.252,
+  "mrr": 0.918,
+  "ndcg_at_5": 0.9311,
+  "chunk_stats": {
+   "count": 34478,
+   "mean_chars": 588.4,
+   "min_chars": 35,
+   "max_chars": 1241
+  },
+  "index_seconds": 13.827,
+  "query_ms_median": 83.7,
+  "query_ms_p95": 101.12,
+  "query_ms_max": 117.78,
+  "failures": [
+   "tkinter/simpledialog.py::askstring",
+   "site-packages/pip/_internal/self_outdated_check.py::pip_self_version_check",
+   "multiprocessing/reduction.py::send_handle"
   ]
  },
  {
   "config": {
    "chunking": "fixed",
    "chunk_size": 1024,
-   "retrieval": "dense",
+   "retrieval": "bm25",
    "embedder": "tfidf"
   },
-  "questions": 300,
-  "recall_at_1": 0.8233,
-  "recall_at_3": 0.9567,
+  "questions": 150,
+  "recall_at_1": 0.8533,
+  "recall_at_3": 0.9667,
   "recall_at_5": 0.9733,
-  "recall_at_10": 0.9833,
-  "precision_at_5": 0.2187,
-  "mrr": 0.8895,
-  "ndcg_at_5": 0.9097,
+  "recall_at_10": 0.9733,
+  "precision_at_5": 0.218,
+  "mrr": 0.9061,
+  "ndcg_at_5": 0.9233,
   "chunk_stats": {
    "count": 15974,
    "mean_chars": 1001.0,
    "min_chars": 129,
    "max_chars": 1024
   },
-  "index_seconds": 10.545,
-  "query_ms_mean": 38.17,
+  "index_seconds": 5.32,
+  "query_ms_median": 14.86,
+  "query_ms_p95": 22.27,
+  "query_ms_max": 26.02,
+  "failures": [
+   "asyncio/exceptions.py::CancelledError",
+   "tkinter/simpledialog.py::askstring",
+   "site-packages/pip/_vendor/distlib/metadata.py::get_fullname",
+   "pydoc.py::filelink"
+  ]
+ },
+ {
+  "config": {
+   "chunking": "recursive",
+   "chunk_size": 2000,
+   "retrieval": "bm25",
+   "embedder": "tfidf"
+  },
+  "questions": 150,
+  "recall_at_1": 0.8333,
+  "recall_at_3": 0.96,
+  "recall_at_5": 0.9667,
+  "recall_at_10": 0.9733,
+  "precision_at_5": 0.203,
+  "mrr": 0.8961,
+  "ndcg_at_5": 0.9135,
+  "chunk_stats": {
+   "count": 8635,
+   "mean_chars": 1626.2,
+   "min_chars": 4,
+   "max_chars": 2000
+  },
+  "index_seconds": 4.488,
+  "query_ms_median": 8.29,
+  "query_ms_p95": 11.71,
+  "query_ms_max": 17.03,
   "failures": [
    "site-packages/pip/_vendor/rich/progress_bar.py::update",
    "asyncio/exceptions.py::CancelledError",
-   "email/headerregistry.py::BaseHeader",
-   "zipimport.py::find_spec",
-   "_pyrepl/unix_console.py::restore"
+   "tkinter/simpledialog.py::askstring",
+   "site-packages/pip/_vendor/distlib/metadata.py::get_fullname"
+  ]
+ },
+ {
+  "config": {
+   "chunking": "fixed",
+   "chunk_size": 512,
+   "retrieval": "hybrid",
+   "embedder": "tfidf"
+  },
+  "questions": 150,
+  "recall_at_1": 0.82,
+  "recall_at_3": 0.9533,
+  "recall_at_5": 0.9667,
+  "recall_at_10": 0.9667,
+  "precision_at_5": 0.2242,
+  "mrr": 0.8833,
+  "ndcg_at_5": 0.9046,
+  "chunk_stats": {
+   "count": 31692,
+   "mean_chars": 505.8,
+   "min_chars": 65,
+   "max_chars": 512
+  },
+  "index_seconds": 6.971,
+  "query_ms_median": 96.92,
+  "query_ms_p95": 111.41,
+  "query_ms_max": 131.3,
+  "failures": [
+   "site-packages/pip/_vendor/rich/progress_bar.py::update",
+   "asyncio/exceptions.py::CancelledError",
+   "tkinter/simpledialog.py::askstring",
+   "site-packages/pip/_vendor/distlib/metadata.py::get_fullname",
+   "pydoc.py::filelink"
+  ]
+ },
+ {
+  "config": {
+   "chunking": "fixed",
+   "chunk_size": 2000,
+   "retrieval": "bm25",
+   "embedder": "tfidf"
+  },
+  "questions": 150,
+  "recall_at_1": 0.8067,
+  "recall_at_3": 0.96,
+  "recall_at_5": 0.9667,
+  "recall_at_10": 0.9733,
+  "precision_at_5": 0.2093,
+  "mrr": 0.8791,
+  "ndcg_at_5": 0.9008,
+  "chunk_stats": {
+   "count": 8333,
+   "mean_chars": 1910.6,
+   "min_chars": 251,
+   "max_chars": 2000
+  },
+  "index_seconds": 4.671,
+  "query_ms_median": 9.07,
+  "query_ms_p95": 14.78,
+  "query_ms_max": 18.62,
+  "failures": [
+   "site-packages/pip/_vendor/rich/progress_bar.py::update",
+   "asyncio/exceptions.py::CancelledError",
+   "site-packages/pip/_vendor/distlib/metadata.py::get_fullname",
+   "pydoc.py::filelink"
+  ]
+ },
+ {
+  "config": {
+   "chunking": "recursive",
+   "chunk_size": 1024,
+   "retrieval": "hybrid",
+   "embedder": "tfidf"
+  },
+  "questions": 150,
+  "recall_at_1": 0.7867,
+  "recall_at_3": 0.9533,
+  "recall_at_5": 0.9667,
+  "recall_at_10": 0.9733,
+  "precision_at_5": 0.2123,
+  "mrr": 0.8708,
+  "ndcg_at_5": 0.8947,
+  "chunk_stats": {
+   "count": 17537,
+   "mean_chars": 799.8,
+   "min_chars": 4,
+   "max_chars": 1024
+  },
+  "index_seconds": 5.546,
+  "query_ms_median": 56.1,
+  "query_ms_p95": 63.5,
+  "query_ms_max": 66.66,
+  "failures": [
+   "site-packages/pip/_vendor/rich/progress_bar.py::update",
+   "asyncio/exceptions.py::CancelledError",
+   "tkinter/simpledialog.py::askstring",
+   "site-packages/pip/_vendor/distlib/metadata.py::get_fullname"
+  ]
+ },
+ {
+  "config": {
+   "chunking": "fixed",
+   "chunk_size": 1024,
+   "retrieval": "hybrid",
+   "embedder": "tfidf"
+  },
+  "questions": 150,
+  "recall_at_1": 0.7867,
+  "recall_at_3": 0.94,
+  "recall_at_5": 0.9667,
+  "recall_at_10": 0.9667,
+  "precision_at_5": 0.2144,
+  "mrr": 0.8644,
+  "ndcg_at_5": 0.8905,
+  "chunk_stats": {
+   "count": 15974,
+   "mean_chars": 1001.0,
+   "min_chars": 129,
+   "max_chars": 1024
+  },
+  "index_seconds": 5.32,
+  "query_ms_median": 51.25,
+  "query_ms_p95": 57.74,
+  "query_ms_max": 65.01,
+  "failures": [
+   "site-packages/pip/_vendor/rich/progress_bar.py::update",
+   "asyncio/exceptions.py::CancelledError",
+   "tkinter/simpledialog.py::askstring",
+   "site-packages/pip/_vendor/distlib/metadata.py::get_fullname",
+   "pydoc.py::filelink"
+  ]
+ },
+ {
+  "config": {
+   "chunking": "fixed",
+   "chunk_size": 512,
+   "retrieval": "dense",
+   "embedder": "tfidf"
+  },
+  "questions": 150,
+  "recall_at_1": 0.7733,
+  "recall_at_3": 0.9333,
+  "recall_at_5": 0.9667,
+  "recall_at_10": 0.9667,
+  "precision_at_5": 0.221,
+  "mrr": 0.8524,
+  "ndcg_at_5": 0.8814,
+  "chunk_stats": {
+   "count": 31692,
+   "mean_chars": 505.8,
+   "min_chars": 65,
+   "max_chars": 512
+  },
+  "index_seconds": 6.971,
+  "query_ms_median": 69.09,
+  "query_ms_p95": 75.72,
+  "query_ms_max": 92.93,
+  "failures": [
+   "site-packages/pip/_vendor/rich/progress_bar.py::update",
+   "asyncio/exceptions.py::CancelledError",
+   "site-packages/pip/_internal/utils/subprocess.py::reveal_command_args",
+   "tkinter/simpledialog.py::askstring",
+   "site-packages/pip/_internal/locations/__init__.py::get_platlib"
   ]
  },
  {
@@ -648,129 +593,94 @@
    "retrieval": "hybrid",
    "embedder": "tfidf"
   },
-  "questions": 300,
-  "recall_at_1": 0.81,
-  "recall_at_3": 0.9667,
-  "recall_at_5": 0.9733,
-  "recall_at_10": 0.9767,
-  "precision_at_5": 0.2086,
-  "mrr": 0.8867,
-  "ndcg_at_5": 0.9087,
+  "questions": 150,
+  "recall_at_1": 0.7467,
+  "recall_at_3": 0.94,
+  "recall_at_5": 0.9667,
+  "recall_at_10": 0.9667,
+  "precision_at_5": 0.2032,
+  "mrr": 0.8467,
+  "ndcg_at_5": 0.8775,
   "chunk_stats": {
    "count": 8635,
    "mean_chars": 1626.2,
    "min_chars": 4,
    "max_chars": 2000
   },
-  "index_seconds": 57623.893,
-  "query_ms_mean": 105.57,
+  "index_seconds": 4.488,
+  "query_ms_median": 37.41,
+  "query_ms_p95": 50.23,
+  "query_ms_max": 54.45,
   "failures": [
    "site-packages/pip/_vendor/rich/progress_bar.py::update",
    "asyncio/exceptions.py::CancelledError",
    "tkinter/simpledialog.py::askstring",
    "site-packages/pip/_vendor/distlib/metadata.py::get_fullname",
-   "email/headerregistry.py::BaseHeader",
-   "zipimport.py::find_spec",
-   "site-packages/pip/_vendor/urllib3/util/ssl_match_hostname.py::match_hostname"
+   "pydoc.py::filelink"
   ]
  },
  {
   "config": {
    "chunking": "fixed",
    "chunk_size": 2000,
-   "retrieval": "dense",
+   "retrieval": "hybrid",
    "embedder": "tfidf"
   },
-  "questions": 300,
-  "recall_at_1": 0.7567,
-  "recall_at_3": 0.9367,
-  "recall_at_5": 0.9733,
-  "recall_at_10": 0.98,
-  "precision_at_5": 0.2153,
-  "mrr": 0.8476,
-  "ndcg_at_5": 0.8788,
+  "questions": 150,
+  "recall_at_1": 0.7533,
+  "recall_at_3": 0.94,
+  "recall_at_5": 0.9667,
+  "recall_at_10": 0.9733,
+  "precision_at_5": 0.2101,
+  "mrr": 0.8462,
+  "ndcg_at_5": 0.8762,
   "chunk_stats": {
    "count": 8333,
    "mean_chars": 1910.6,
    "min_chars": 251,
    "max_chars": 2000
   },
-  "index_seconds": 6.263,
-  "query_ms_mean": 19.17,
+  "index_seconds": 4.671,
+  "query_ms_median": 28.5,
+  "query_ms_p95": 33.6,
+  "query_ms_max": 41.4,
   "failures": [
    "site-packages/pip/_vendor/rich/progress_bar.py::update",
    "asyncio/exceptions.py::CancelledError",
    "site-packages/pip/_vendor/distlib/metadata.py::get_fullname",
-   "pydoc.py::filelink",
-   "email/headerregistry.py::BaseHeader",
-   "site-packages/pip/_vendor/urllib3/util/ssl_match_hostname.py::match_hostname"
+   "pydoc.py::filelink"
   ]
  },
  {
   "config": {
-   "chunking": "auto",
-   "chunk_size": 2000,
-   "retrieval": "dense",
-   "embedder": "tfidf"
-  },
-  "questions": 300,
-  "recall_at_1": 0.85,
-  "recall_at_3": 0.9533,
-  "recall_at_5": 0.97,
-  "recall_at_10": 0.9733,
-  "precision_at_5": 0.2318,
-  "mrr": 0.9036,
-  "ndcg_at_5": 0.9202,
-  "chunk_stats": {
-   "count": 26384,
-   "mean_chars": 754.9,
-   "min_chars": 35,
-   "max_chars": 2208
-  },
-  "index_seconds": 13.603,
-  "query_ms_mean": 70.75,
-  "failures": [
-   "site-packages/pip/_internal/network/session.py::user_agent",
-   "pkgutil.py::get_data",
-   "site-packages/pip/_internal/commands/install.py::create_os_error_message",
-   "multiprocessing/reduction.py::send_handle",
-   "email/headerregistry.py::BaseHeader",
-   "multiprocessing/managers.py::list_segments",
-   "site-packages/pip/_vendor/distlib/compat.py::configure_custom",
-   "multiprocessing/popen_spawn_win32.py::Popen"
-  ]
- },
- {
-  "config": {
-   "chunking": "recursive",
+   "chunking": "fixed",
    "chunk_size": 1024,
    "retrieval": "dense",
    "embedder": "tfidf"
   },
-  "questions": 300,
-  "recall_at_1": 0.7633,
-  "recall_at_3": 0.9367,
-  "recall_at_5": 0.9633,
-  "recall_at_10": 0.9767,
-  "precision_at_5": 0.2139,
-  "mrr": 0.8516,
-  "ndcg_at_5": 0.8788,
+  "questions": 150,
+  "recall_at_1": 0.7533,
+  "recall_at_3": 0.9133,
+  "recall_at_5": 0.9533,
+  "recall_at_10": 0.9733,
+  "precision_at_5": 0.2129,
+  "mrr": 0.8414,
+  "ndcg_at_5": 0.8674,
   "chunk_stats": {
-   "count": 17537,
-   "mean_chars": 799.8,
-   "min_chars": 4,
+   "count": 15974,
+   "mean_chars": 1001.0,
+   "min_chars": 129,
    "max_chars": 1024
   },
-  "index_seconds": 13.784,
-  "query_ms_mean": 43.89,
+  "index_seconds": 5.32,
+  "query_ms_median": 34.43,
+  "query_ms_p95": 36.85,
+  "query_ms_max": 41.74,
   "failures": [
    "site-packages/pip/_vendor/rich/progress_bar.py::update",
-   "tomllib/_parser.py::Flags",
+   "asyncio/exceptions.py::CancelledError",
    "tkinter/simpledialog.py::askstring",
-   "site-packages/pip/_vendor/distlib/metadata.py::get_fullname",
-   "email/headerregistry.py::BaseHeader",
-   "zipimport.py::find_spec",
-   "site-packages/pip/_vendor/urllib3/util/ssl_match_hostname.py::match_hostname"
+   "site-packages/pip/_vendor/distlib/version.py::is_valid_constraint_list"
   ]
  },
  {
@@ -780,22 +690,24 @@
    "retrieval": "dense",
    "embedder": "tfidf"
   },
-  "questions": 300,
-  "recall_at_1": 0.7,
-  "recall_at_3": 0.9167,
-  "recall_at_5": 0.9633,
-  "recall_at_10": 0.9633,
-  "precision_at_5": 0.2068,
-  "mrr": 0.8101,
-  "ndcg_at_5": 0.8489,
+  "questions": 150,
+  "recall_at_1": 0.5867,
+  "recall_at_3": 0.9067,
+  "recall_at_5": 0.9533,
+  "recall_at_10": 0.9533,
+  "precision_at_5": 0.2039,
+  "mrr": 0.7448,
+  "ndcg_at_5": 0.7979,
   "chunk_stats": {
    "count": 8635,
    "mean_chars": 1626.2,
    "min_chars": 4,
    "max_chars": 2000
   },
-  "index_seconds": 57623.893,
-  "query_ms_mean": 33.12,
+  "index_seconds": 4.488,
+  "query_ms_median": 19.12,
+  "query_ms_p95": 22.06,
+  "query_ms_max": 33.37,
   "failures": [
    "site-packages/pip/_vendor/rich/progress_bar.py::update",
    "asyncio/exceptions.py::CancelledError",
@@ -803,11 +715,144 @@
    "tkinter/simpledialog.py::askstring",
    "site-packages/pip/_vendor/distlib/metadata.py::get_fullname",
    "site-packages/pip/_vendor/pygments/formatters/latex.py::get_style_defs",
-   "email/headerregistry.py::BaseHeader",
-   "zipimport.py::find_spec",
-   "site-packages/pip/_vendor/urllib3/util/ssl_match_hostname.py::match_hostname",
-   "zipfile/__init__.py::printdir",
-   "_pyrepl/unix_console.py::restore"
+   "site-packages/pip/_vendor/distlib/version.py::is_valid_constraint_list"
+  ]
+ },
+ {
+  "config": {
+   "chunking": "fixed",
+   "chunk_size": 2000,
+   "retrieval": "dense",
+   "embedder": "tfidf"
+  },
+  "questions": 150,
+  "recall_at_1": 0.6733,
+  "recall_at_3": 0.8933,
+  "recall_at_5": 0.9467,
+  "recall_at_10": 0.9533,
+  "precision_at_5": 0.2109,
+  "mrr": 0.7895,
+  "ndcg_at_5": 0.8287,
+  "chunk_stats": {
+   "count": 8333,
+   "mean_chars": 1910.6,
+   "min_chars": 251,
+   "max_chars": 2000
+  },
+  "index_seconds": 4.671,
+  "query_ms_median": 18.02,
+  "query_ms_p95": 19.79,
+  "query_ms_max": 30.49,
+  "failures": [
+   "site-packages/pip/_vendor/rich/progress_bar.py::update",
+   "asyncio/exceptions.py::CancelledError",
+   "tkinter/simpledialog.py::askstring",
+   "site-packages/pip/_vendor/distlib/metadata.py::get_fullname",
+   "site-packages/pip/_internal/commands/install.py::create_os_error_message",
+   "site-packages/pip/_vendor/distlib/version.py::is_valid_constraint_list",
+   "pydoc.py::filelink"
+  ]
+ },
+ {
+  "config": {
+   "chunking": "auto",
+   "chunk_size": 2000,
+   "retrieval": "dense",
+   "embedder": "tfidf"
+  },
+  "questions": 150,
+  "recall_at_1": 0.8133,
+  "recall_at_3": 0.9333,
+  "recall_at_5": 0.94,
+  "recall_at_10": 0.9667,
+  "precision_at_5": 0.2207,
+  "mrr": 0.8712,
+  "ndcg_at_5": 0.8855,
+  "chunk_stats": {
+   "count": 26384,
+   "mean_chars": 754.9,
+   "min_chars": 35,
+   "max_chars": 2208
+  },
+  "index_seconds": 16.676,
+  "query_ms_median": 61.92,
+  "query_ms_p95": 73.34,
+  "query_ms_max": 97.84,
+  "failures": [
+   "site-packages/pip/_internal/network/session.py::user_agent",
+   "tkinter/simpledialog.py::askstring",
+   "pkgutil.py::get_data",
+   "site-packages/pip/_internal/commands/install.py::create_os_error_message",
+   "multiprocessing/reduction.py::send_handle"
+  ]
+ },
+ {
+  "config": {
+   "chunking": "recursive",
+   "chunk_size": 1024,
+   "retrieval": "dense",
+   "embedder": "tfidf"
+  },
+  "questions": 150,
+  "recall_at_1": 0.6467,
+  "recall_at_3": 0.8867,
+  "recall_at_5": 0.94,
+  "recall_at_10": 0.96,
+  "precision_at_5": 0.2047,
+  "mrr": 0.7662,
+  "ndcg_at_5": 0.808,
+  "chunk_stats": {
+   "count": 17537,
+   "mean_chars": 799.8,
+   "min_chars": 4,
+   "max_chars": 1024
+  },
+  "index_seconds": 5.546,
+  "query_ms_median": 41.66,
+  "query_ms_p95": 48.58,
+  "query_ms_max": 75.69,
+  "failures": [
+   "site-packages/pip/_vendor/rich/progress_bar.py::update",
+   "asyncio/exceptions.py::CancelledError",
+   "tomllib/_parser.py::Flags",
+   "tkinter/simpledialog.py::askstring",
+   "_pyrepl/pager.py::plain",
+   "site-packages/pip/_vendor/distlib/metadata.py::get_fullname"
+  ]
+ },
+ {
+  "config": {
+   "chunking": "recursive",
+   "chunk_size": 512,
+   "retrieval": "dense",
+   "embedder": "tfidf"
+  },
+  "questions": 150,
+  "recall_at_1": 0.7467,
+  "recall_at_3": 0.88,
+  "recall_at_5": 0.9133,
+  "recall_at_10": 0.9533,
+  "precision_at_5": 0.1993,
+  "mrr": 0.8227,
+  "ndcg_at_5": 0.8414,
+  "chunk_stats": {
+   "count": 36605,
+   "mean_chars": 382.4,
+   "min_chars": 3,
+   "max_chars": 512
+  },
+  "index_seconds": 9.419,
+  "query_ms_median": 89.16,
+  "query_ms_p95": 101.58,
+  "query_ms_max": 119.97,
+  "failures": [
+   "asyncio/exceptions.py::CancelledError",
+   "enum.py::FlagBoundary",
+   "tkinter/simpledialog.py::askstring",
+   "site-packages/pip/_vendor/distlib/metadata.py::get_fullname",
+   "site-packages/pip/_internal/locations/__init__.py::get_platlib",
+   "site-packages/pip/_internal/locations/__init__.py::get_purelib",
+   "pyclbr.py::Class"
   ]
  }
 ]

@@ -27,7 +27,7 @@ from .corpus import (
     load_stdlib,
     split_questions,
 )
-from .embedding import get_embedder
+from .embedding import get_embedder, tokenize
 from .evaluation import evaluate_retrieval, run_grid
 from .generation import answer_question, get_generator
 from .retrieval import Retriever
@@ -49,7 +49,12 @@ def build_index() -> None:
     full = os.getenv("RAG_STDLIB_FULL", "0") == "1"
     strategy = os.getenv("RAG_CHUNKING", "auto")
     size = int(os.getenv("RAG_CHUNK_SIZE", "1024"))
-    embedder_name = os.getenv("RAG_EMBEDDER", "auto")
+    # TF-IDF by default, not "auto". "auto" prefers fastembed, and embedding
+    # thousands of chunks through ONNX on CPU takes minutes where TF-IDF takes
+    # seconds -- as a startup default that reads as a hung deploy. Real
+    # embeddings are opt-in via RAG_EMBEDDER=fastembed, and the experiment
+    # script can use them without blocking a web process.
+    embedder_name = os.getenv("RAG_EMBEDDER", "tfidf")
 
     corpus: Corpus = (
         load_directory(corpus_dir) if corpus_dir else load_stdlib(full=full)
@@ -156,16 +161,6 @@ async def index_head():
     return FileResponse(STATIC_DIR / "index.html")
 
 
-@app.get("/app.css", include_in_schema=False)
-async def app_css():
-    return FileResponse(STATIC_DIR / "app.css", media_type="text/css")
-
-
-@app.get("/app.js", include_in_schema=False)
-async def app_js():
-    return FileResponse(STATIC_DIR / "app.js", media_type="text/javascript")
-
-
 @app.get("/health")
 async def health():
     retriever = STATE.get("retriever")
@@ -193,13 +188,35 @@ async def search(request: SearchRequest):
     hits = _retriever(request.session_id).search(
         request.query, k=request.k, mode=request.mode
     )
+
+    # Retrieval always returns k results, whether or not any of them are
+    # relevant. Without a signal for that, a visitor reads noise as an answer:
+    # a query about something the corpus never mentions still produces five
+    # confident-looking passages. Coverage is the share of the question's
+    # content words that actually appear in a passage, which is interpretable
+    # and does not depend on a score scale that shifts per corpus.
+    query_tokens = {t for t in tokenize(request.query) if len(t) > 2}
+
+    def coverage(text: str) -> float:
+        if not query_tokens:
+            return 0.0
+        return len(query_tokens & set(tokenize(text))) / len(query_tokens)
+
+    coverages = [coverage(h.chunk.text) for h in hits]
+    best_coverage = max(coverages, default=0.0)
+
     return {
         "query": request.query,
         "scope": "uploaded" if request.session_id else "corpus",
+        "best_coverage": round(best_coverage, 3),
+        # Under a third of the question's terms found anywhere in the top
+        # results means these are the least-bad matches, not answers.
+        "weak_match": best_coverage < 0.34,
         "mode": request.mode,
         "hits": [
             {
                 "rank": i,
+                "coverage": round(c, 3),
                 "doc_id": h.chunk.doc_id,
                 "chunk_id": h.chunk.chunk_id,
                 "score": round(h.score, 4),
@@ -207,7 +224,7 @@ async def search(request: SearchRequest):
                 "text": h.chunk.text[:1500],
                 "meta": h.chunk.meta,
             }
-            for i, h in enumerate(hits, start=1)
+            for i, (h, c) in enumerate(zip(hits, coverages), start=1)
         ],
     }
 
@@ -333,3 +350,20 @@ async def session_delete(session_id: str):
 async def upload_limits():
     """The caps, so the UI can state them instead of discovering them."""
     return store.stats()
+
+
+# Named explicitly rather than mounted, so only these files are reachable
+# and a new asset cannot be served by accident.
+_ASSETS = {
+    "app.css": "text/css",
+    "app.js": "text/javascript",
+    "upload.js": "text/javascript",
+}
+
+
+@app.get("/{asset}", include_in_schema=False)
+async def asset(asset: str):
+    media_type = _ASSETS.get(asset)
+    if media_type is None:
+        raise HTTPException(status_code=404, detail="not found")
+    return FileResponse(STATIC_DIR / asset, media_type=media_type)

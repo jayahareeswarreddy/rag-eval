@@ -348,3 +348,103 @@ def test_stopwords_do_not_dominate_a_small_corpus():
     for mode in ("dense", "bm25", "hybrid"):
         top = retriever.search("can I deploy on a friday", k=1, mode=mode)[0]
         assert "Deployment" in top.chunk.text, f"{mode} matched the wrong section"
+
+
+# ------------------------------------------------------- upload sessions
+
+@pytest.fixture
+def store():
+    from app.sessions import SessionStore
+
+    return SessionStore()
+
+
+def test_upload_indexes_and_is_queryable(store):
+    session, skipped = store.add(
+        [
+            ("handbook.md", b"# Handbook\n\n## Deploys\nFriday deploys need approval from a staff engineer.\n"),
+            ("notes.txt", b"Receipts must be submitted within thirty days of the expense date.\n"),
+        ]
+    )
+    assert not skipped
+    assert len(session.documents) == 2
+    hits = session.retriever.search("can I deploy on friday", k=1)
+    assert "Friday" in hits[0].chunk.text
+
+
+@pytest.mark.parametrize(
+    "name,data,reason",
+    [
+        ("thing.exe", b"MZ\x90\x00binary", "not supported"),
+        ("notes.md", b"\xff\xfe\x00bad utf8", "UTF-8"),
+        ("tiny.txt", b"short", "too short"),
+    ],
+)
+def test_unusable_uploads_are_reported_not_silently_dropped(store, name, data, reason):
+    session, skipped = store.add([(name, data)])
+    assert len(skipped) == 1
+    assert reason.lower() in skipped[0]["reason"].lower()
+
+
+def test_a_text_extension_hiding_binary_is_rejected(store):
+    """A NUL byte means binary content wearing a text extension."""
+    _, skipped = store.add([("payload.txt", b"text\x00\x01\x02more text here padding")])
+    assert skipped and "binary" in skipped[0]["reason"].lower()
+
+
+def test_filenames_are_reduced_to_plain_labels():
+    from app.sessions import safe_name
+
+    # The name is a label and a dict key, never a path.
+    assert "/" not in safe_name("../../etc/passwd")
+    assert chr(92) not in safe_name(".." + chr(92) + "windows" + chr(92) + "x.txt")
+    assert safe_name("") == "untitled"
+    assert len(safe_name("x" * 400)) <= 120
+
+
+def test_session_character_cap_is_enforced(store):
+    from app.sessions import MAX_SESSION_CHARS
+
+    big = ("word " * 40_000).encode()          # ~200KB each
+    files = [(f"doc{i}.txt", big) for i in range(30)]
+    session, skipped = store.add(files)
+    assert session.total_chars <= MAX_SESSION_CHARS
+    assert skipped
+
+
+def test_store_evicts_once_full(store):
+    from app.sessions import MAX_SESSIONS
+
+    for i in range(MAX_SESSIONS + 6):
+        store.add([(f"d{i}.txt", b"a document with enough characters to index properly")])
+    assert store.stats()["active_sessions"] <= MAX_SESSIONS
+
+
+def test_dropping_a_session_makes_it_unreachable(store):
+    session, _ = store.add([("d.txt", b"a document with enough characters to be indexed")])
+    assert store.get(session.id) is not None
+    assert store.drop(session.id)
+    assert store.get(session.id) is None
+
+
+# -------------------------------------------------- weak-match detection
+
+def test_coverage_separates_a_real_match_from_noise():
+    """
+    Retrieval returns k results whether or not any are relevant, so a query
+    the corpus never mentions still yields confident-looking passages.
+    Coverage is what distinguishes them.
+    """
+    from app.embedding import tokenize
+
+    passage = (
+        "Every mutating endpoint accepts an idempotency key header. "
+        "Retrying with the same key must not create a second resource."
+    )
+
+    def coverage(question: str) -> float:
+        q = {t for t in tokenize(question) if len(t) > 2}
+        return len(q & set(tokenize(passage))) / len(q)
+
+    assert coverage("idempotency key header") == 1.0
+    assert coverage("what is the parental leave policy") < 0.34

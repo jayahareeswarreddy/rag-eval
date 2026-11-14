@@ -52,11 +52,20 @@ async function loadStatus() {
   const el = $('#status');
   try {
     const h = await api('/health');
-    const docs = h.corpus?.documents ?? 0;
-    const chunks = h.chunks?.count ?? 0;
     const gen = h.generator === 'unavailable' ? 'extractive' : h.generator.split(':')[0];
+
+    // Report the scope actually being searched. Showing the demo corpus while
+    // queries run against an upload is simply wrong information.
+    const id = window.ragScope ? window.ragScope() : null;
+    let scope;
+    if (id) {
+      const s = window.ragScopeInfo || {};
+      scope = `${s.documents ?? '?'} of your files · ${(s.chunks?.count ?? 0).toLocaleString()} passages`;
+    } else {
+      scope = `${h.corpus?.documents ?? 0} docs · ${(h.chunks?.count ?? 0).toLocaleString()} chunks`;
+    }
     el.innerHTML =
-      `<span class="dot dot-ok"></span><span>${docs} docs · ${chunks.toLocaleString()} chunks · ${esc(gen)}</span>`;
+      `<span class="dot dot-ok"></span><span>${esc(scope)} · ${esc(gen)}</span>`;
   } catch (err) {
     el.innerHTML = `<span class="dot dot-bad"></span><span>${esc(err.message)}</span>`;
   }
@@ -70,6 +79,9 @@ function renderHit(hit) {
     d.rrf !== undefined ? `<span class="chip rrf">rrf ${fmt(d.rrf, 4)}</span>` : '',
     d.dense !== undefined ? `<span class="chip dense">dense ${fmt(d.dense)}</span>` : '',
     d.bm25 !== undefined ? `<span class="chip bm25">bm25 ${fmt(d.bm25, 2)}</span>` : '',
+    hit.coverage !== undefined
+      ? `<span class="chip cov" title="share of your question's terms found in this passage">${Math.round(hit.coverage * 100)}% terms</span>`
+      : '',
   ].join('');
 
   const symbol = hit.meta?.symbol
@@ -89,10 +101,16 @@ function renderHit(hit) {
   </article>`;
 }
 
+/** Uploaded documents take over the scope when a session is active. */
+function scoped(body) {
+  const id = window.ragScope ? window.ragScope() : null;
+  return id ? { ...body, session_id: id } : body;
+}
+
 async function runSearch(query, mode) {
   return api('/search', {
     method: 'POST',
-    body: JSON.stringify({ query, k: 5, mode }),
+    body: JSON.stringify(scoped({ query, k: 5, mode })),
   });
 }
 
@@ -116,10 +134,16 @@ $('#search-form').addEventListener('submit', async (e) => {
     out.innerHTML = results
       .map((res, i) => {
         const heading = compareAll ? `<h2 class="section-label">${esc(modes[i])}</h2>` : '';
-        const body = res.hits.length
-          ? res.hits.map(renderHit).join('')
-          : '<div class="card muted">Nothing retrieved for that query.</div>';
-        return heading + body;
+        if (!res.hits.length) {
+          return heading + '<div class="card muted">Nothing retrieved for that query.</div>';
+        }
+        // Say so when the top results barely contain the question's terms.
+        const warn = res.weak_match
+          ? `<div class="card weak"><strong>No strong match.</strong> These are the
+             closest passages, but only ${Math.round(res.best_coverage * 100)}% of your
+             question's terms appear in the best one — the documents may not cover this.</div>`
+          : '';
+        return heading + warn + res.hits.map(renderHit).join('');
       })
       .join('');
   } catch (err) {
@@ -144,7 +168,7 @@ $('#ask-form').addEventListener('submit', async (e) => {
   try {
     const a = await api('/ask', {
       method: 'POST',
-      body: JSON.stringify({ query, k: 5, mode: 'hybrid' }),
+      body: JSON.stringify(scoped({ query, k: 5, mode: 'hybrid' })),
     });
 
     // SVG, not emoji: emoji render inconsistently across platforms and are
@@ -185,7 +209,7 @@ $('#ask-form').addEventListener('submit', async (e) => {
     out.innerHTML = `
       <div class="card">
         ${verdict}
-        <p style="margin:0 0 16px">${esc(a.text)}</p>
+        <p class="answer-text">${esc(a.text)}</p>
         <h2 class="section-label" style="margin-top:0">Claim verification</h2>
         ${claims}
         <p class="legend">
@@ -214,7 +238,7 @@ const COLUMNS = [
   { key: 'r5', label: 'R@5', get: (r) => r.recall_at_5, num: true },
   { key: 'mrr', label: 'MRR', get: (r) => r.mrr, num: true },
   { key: 'ndcg', label: 'nDCG@5', get: (r) => r.ndcg_at_5, num: true },
-  { key: 'ms', label: 'ms/query', get: (r) => r.query_ms_mean, num: true },
+  { key: 'ms', label: 'ms p50', get: (r) => r.query_ms_median, num: true },
 ];
 
 let rows = [];

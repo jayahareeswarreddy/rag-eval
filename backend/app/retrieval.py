@@ -117,8 +117,12 @@ class Retriever:
 
     The index is in-process NumPy. For the corpus sizes this harness targets
     (tens of thousands of chunks) a brute-force cosine is a few milliseconds,
-    and it removes a network dependency from every experiment. `store.py`
-    carries the Qdrant adapter for when persistence is wanted.
+    and it removes a network dependency from every experiment, which matters
+    when the point is to compare configurations rather than to serve traffic.
+
+    There is deliberately no external vector database here. Adding one would
+    not change any measured result -- the same vectors and the same cosine --
+    while making every experiment depend on a running service.
     """
 
     def __init__(self, embedder: Embedder) -> None:

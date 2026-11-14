@@ -124,38 +124,73 @@ class Generator(ABC):
 
 class ExtractiveGenerator(Generator):
     """
-    Builds an answer by selecting sentences from retrieved chunks.
+    Builds an answer by selecting sentences from retrieved passages.
 
-    No model, no key, no network. It cannot hallucinate because it only
-    concatenates text that was retrieved, which makes it the control that
-    proves the grounding check is measuring something real: it should always
-    pass verification.
+    No model, no key, no network. It cannot invent a fact because it only
+    repeats retrieved text, which makes it the control that proves the
+    grounding check measures something real: it must always verify.
+
+    It does *not* take the best sentence from every hit. Retrieval returns the
+    top k whether or not all k are relevant, so quoting one sentence from each
+    produces an answer that is fully grounded and still mostly off-topic --
+    grounded and relevant are different properties, and only the first is what
+    citation checking can establish. Sentences are therefore scored against
+    the question and dropped below a relevance floor, even when that leaves
+    one sentence or none.
     """
 
     name = "extractive"
+
+    # Share of the question's content words a sentence must cover to be used.
+    RELEVANCE_FLOOR = 0.34
+    MAX_SENTENCES = 3
 
     def generate(self, question: str, hits: list[Hit]) -> str:
         if not hits:
             return "No relevant passage was retrieved for this question."
 
-        query_tokens = {t for t in tokenize(question) if len(t) > 3}
-        picked: list[str] = []
+        query_tokens = {t for t in tokenize(question) if len(t) > 2}
+        if not query_tokens:
+            return "The question has no searchable terms."
 
-        for i, hit in enumerate(hits[:3], start=1):
-            sentences = [
-                s.strip()
-                for s in SENTENCE.split(hit.chunk.text.replace("\n", " "))
-                if len(s.strip()) > 30
-            ]
-            if not sentences:
+        candidates: list[tuple[float, int, str]] = []
+        for index, hit in enumerate(hits, start=1):
+            for raw in SENTENCE.split(hit.chunk.text.replace(chr(10), " ")):
+                sentence = raw.strip()
+                if len(sentence) < 30:
+                    continue
+                overlap = len(query_tokens & set(tokenize(sentence)))
+                if not overlap:
+                    continue
+                candidates.append((overlap / len(query_tokens), index, sentence))
+
+        candidates.sort(key=lambda c: (-c[0], c[1]))
+
+        picked: list[tuple[int, str]] = []
+        seen: set[str] = set()
+        for score, index, sentence in candidates:
+            if score < self.RELEVANCE_FLOOR:
+                break
+            key = sentence[:60].lower()
+            if key in seen:
                 continue
-            best = max(
-                sentences,
-                key=lambda s: len(query_tokens & set(tokenize(s))),
-            )
-            picked.append(f"{best.rstrip('.')} [{i}].")
+            seen.add(key)
+            picked.append((index, sentence))
+            if len(picked) >= self.MAX_SENTENCES:
+                break
 
-        return " ".join(picked) or "No relevant passage was retrieved."
+        if not picked:
+            # Saying so is better than padding with the highest-ranked text
+            # and letting a green badge imply the question was answered.
+            return (
+                "The retrieved passages do not clearly answer this question. "
+                "The closest match was "
+                f"{hits[0].chunk.doc_id} [1]."
+            )
+
+        # Restore retrieval order so the answer reads top-down.
+        picked.sort(key=lambda p: p[0])
+        return " ".join(f"{text.rstrip('.')} [{index}]." for index, text in picked)
 
 
 class LLMGenerator(Generator):
