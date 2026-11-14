@@ -10,7 +10,7 @@ instead: four chunking strategies and three retrievers, scored against
 labelled questions, with every generated sentence verified against the
 passage it cites. Upload your own documents and query them from the browser.
 
-**Live demo → _(deploying)_**
+**Live demo → [rag-eval-7psf.onrender.com](https://rag-eval-7psf.onrender.com)**
 
 ---
 
